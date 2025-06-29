@@ -1,0 +1,120 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  USER
+  MODERATOR
+}
+
+model User {
+  id        String    @id @default(uuid())
+  name      String
+  username  String    @unique
+  password  String
+  role      Role      @default(USER)
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  post    Post[]
+  comment Comment[]
+  token   Token[]
+
+  @@index([username])
+  @@map("users")
+}
+
+model Category {
+  id        String    @id @default(uuid())
+  name      String    @unique
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  posts Post[]
+
+  @@index([name])
+  @@map("categories")
+}
+
+model Post {
+  id         String    @id @default(uuid())
+  userId     String    @map("user_id")
+  categoryId String    @map("category_id")
+  title      String
+  content    String
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+  deletedAt  DateTime? @map("deleted_at")
+
+  category Category  @relation(fields: [categoryId], references: [id])
+  comment  Comment[]
+
+  tag  PostTag[]
+  user User      @relation(fields: [userId], references: [id])
+
+  @@index([title])
+  @@map("posts")
+}
+
+model Tag {
+  id   String    @id @default(uuid())
+  name String    @unique
+  post PostTag[]
+
+  @@index([name])
+  @@map("tags")
+}
+
+model PostTag {
+  postId String
+  tagId  String
+  tag    Tag    @relation(fields: [tagId], references: [id])
+  post   Post   @relation(fields: [postId], references: [id])
+
+  @@id([postId, tagId])
+  @@map("post_tags")
+}
+
+model Comment {
+  id        String    @id @default(uuid())
+  userId    String    @map("user_id")
+  postId    String    @map("post_id")
+  content   String
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  post Post @relation(fields: [postId], references: [id])
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([postId])
+  @@map("comments")
+}
+
+model Token {
+  id        String    @id @default(uuid())
+  userId    String    @map("user_id")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  expiresAt DateTime  @map("expires_at")
+  revokedAt DateTime? @map("revoked_at")
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@map("tokens")
+}
