@@ -17,6 +17,7 @@ export class PostRepository {
       where: { title, deletedAt: null },
       include: {
         category: true,
+        tag: true,
       },
     });
   }
@@ -28,6 +29,7 @@ export class PostRepository {
       },
       include: {
         category: true,
+        tag: true,
       },
     });
   }
@@ -37,6 +39,7 @@ export class PostRepository {
       where: { id, deletedAt: null },
       include: {
         category: true,
+        tag: true,
       },
     });
   }
