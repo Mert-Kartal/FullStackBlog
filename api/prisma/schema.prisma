@@ -13,29 +13,29 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  ADMIN
-  USER
-  MODERATOR
-}
+// enum Role {
+//   ADMIN
+//   USER
+//   MODERATOR
+// }
 
-model User {
-  id        String    @id @default(uuid())
-  name      String
-  username  String    @unique
-  password  String
-  role      Role      @default(USER)
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
-  deletedAt DateTime? @map("deleted_at")
+// model User {
+//   id        String    @id @default(uuid())
+//   name      String
+//   username  String    @unique
+//   password  String
+//   role      Role      @default(USER)
+//   createdAt DateTime  @default(now()) @map("created_at")
+//   updatedAt DateTime  @updatedAt @map("updated_at")
+//   deletedAt DateTime? @map("deleted_at")
 
-  post    Post[]
-  comment Comment[]
-  token   Token[]
+//   post    Post[]
+//   comment Comment[]
+//   token   Token[]
 
-  @@index([username])
-  @@map("users")
-}
+//   @@index([username])
+//   @@map("users")
+// }
 
 model Category {
   id        String    @id @default(uuid())
@@ -52,7 +52,7 @@ model Category {
 
 model Post {
   id         String    @id @default(uuid())
-  userId     String    @map("user_id")
+  // userId     String    @map("user_id")
   categoryId String    @map("category_id")
   title      String
   content    String
@@ -63,8 +63,8 @@ model Post {
   category Category  @relation(fields: [categoryId], references: [id])
   comment  Comment[]
 
-  tag  PostTag[]
-  user User      @relation(fields: [userId], references: [id])
+  tag PostTag[]
+  // user User      @relation(fields: [userId], references: [id])
 
   @@index([title])
   @@map("posts")
@@ -91,7 +91,7 @@ model PostTag {
 
 model Comment {
   id        String    @id @default(uuid())
-  userId    String    @map("user_id")
+  // userId    String    @map("user_id")
   postId    String    @map("post_id")
   content   String
   createdAt DateTime  @default(now()) @map("created_at")
@@ -99,22 +99,22 @@ model Comment {
   deletedAt DateTime? @map("deleted_at")
 
   post Post @relation(fields: [postId], references: [id])
-  user User @relation(fields: [userId], references: [id])
+  // user User @relation(fields: [userId], references: [id])
 
-  @@index([userId])
+  // @@index([userId])
   @@index([postId])
   @@map("comments")
 }
 
-model Token {
-  id        String    @id @default(uuid())
-  userId    String    @map("user_id")
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
-  expiresAt DateTime  @map("expires_at")
-  revokedAt DateTime? @map("revoked_at")
+// model Token {
+//   id        String    @id @default(uuid())
+//   userId    String    @map("user_id")
+//   createdAt DateTime  @default(now()) @map("created_at")
+//   updatedAt DateTime  @updatedAt @map("updated_at")
+//   expiresAt DateTime  @map("expires_at")
+//   revokedAt DateTime? @map("revoked_at")
 
-  user User @relation(fields: [userId], references: [id])
+//   user User @relation(fields: [userId], references: [id])
 
-  @@map("tokens")
-}
+//   @@map("tokens")
+// }
