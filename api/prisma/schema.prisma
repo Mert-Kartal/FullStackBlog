@@ -13,29 +13,29 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// enum Role {
-//   ADMIN
-//   USER
-//   MODERATOR
-// }
+enum Role {
+  ADMIN
+  USER
+  MODERATOR
+}
 
-// model User {
-//   id        String    @id @default(uuid())
-//   name      String
-//   username  String    @unique
-//   password  String
-//   role      Role      @default(USER)
-//   createdAt DateTime  @default(now()) @map("created_at")
-//   updatedAt DateTime  @updatedAt @map("updated_at")
-//   deletedAt DateTime? @map("deleted_at")
+model User {
+  id        String    @id @default(uuid())
+  name      String
+  username  String    @unique
+  password  String
+  role      Role      @default(USER)
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
-//   post    Post[]
-//   comment Comment[]
-//   token   Token[]
+  //   post    Post[]
+  //   comment Comment[]
+  //   token   Token[]
 
-//   @@index([username])
-//   @@map("users")
-// }
+  @@index([username])
+  @@map("users")
+}
 
 model Category {
   id        String    @id @default(uuid())

@@ -8,7 +8,13 @@ import { PostModule } from './post/post.module';
 import { TagModule } from './tag/tag.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), PrismaModule, CategoryModule, PostModule, TagModule],
+  imports: [
+    ConfigModule.forRoot(),
+    PrismaModule,
+    CategoryModule,
+    PostModule,
+    TagModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
