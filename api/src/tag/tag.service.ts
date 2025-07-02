@@ -35,6 +35,9 @@ export class TagService {
     if (!existTag) {
       throw new NotFoundException('Tag not found');
     }
+    if (data.name === existTag.name) {
+      throw new BadRequestException('Tag name is the same as before');
+    }
     const existTagByName = await this.tagRepository.getTagByName(data.name);
     if (existTagByName) {
       throw new BadRequestException('Tag already exists');

@@ -38,6 +38,9 @@ export class CategoryService {
     if (!existCategory) {
       throw new NotFoundException('Category not found');
     }
+    if (data.name === existCategory.name) {
+      throw new BadRequestException('Category name is the same as before');
+    }
     const existCategoryByName = await this.categoryRepository.getCategoryByName(
       data.name,
     );
