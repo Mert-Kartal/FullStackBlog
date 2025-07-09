@@ -32,6 +32,7 @@ model User {
   //   post    Post[]
   //   comment Comment[]
   //   token   Token[]
+  Token Token[]
 
   @@index([username])
   @@map("users")
@@ -106,15 +107,15 @@ model Comment {
   @@map("comments")
 }
 
-// model Token {
-//   id        String    @id @default(uuid())
-//   userId    String    @map("user_id")
-//   createdAt DateTime  @default(now()) @map("created_at")
-//   updatedAt DateTime  @updatedAt @map("updated_at")
-//   expiresAt DateTime  @map("expires_at")
-//   revokedAt DateTime? @map("revoked_at")
+model Token {
+  id        String    @id @default(uuid())
+  userId    String    @map("user_id")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  expiresAt DateTime  @map("expires_at")
+  revokedAt DateTime? @map("revoked_at")
 
-//   user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id])
 
-//   @@map("tokens")
-// }
+  @@map("tokens")
+}
