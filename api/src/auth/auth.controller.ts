@@ -15,4 +15,14 @@ export class AuthController {
   async login(@Body() data: LoginUserDto) {
     return this.authService.login(data);
   }
+
+  @Post('logout')
+  async logout(@Body() data: { refreshToken: string }) {
+    return this.authService.logout(data.refreshToken);
+  }
+
+  @Post('refresh')
+  async refresh(@Body() data: { refreshToken: string }) {
+    return this.authService.refresh(data.refreshToken);
+  }
 }

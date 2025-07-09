@@ -1,23 +1,14 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import * as jwt from 'jsonwebtoken';
 import { PrismaService } from '../prisma/prisma.service';
-
-interface JwtPayload {
-  userId: string;
-  role: string;
-}
-
-interface RefreshTokenPayload {
-  userId: string;
-  role: string;
-  jti: string;
-}
+import { TokenPayload, RefreshTokenPayload } from '../types/express';
+import { Role } from '@prisma/client';
 
 @Injectable()
 export class JwtService {
   constructor(private readonly prisma: PrismaService) {}
 
-  generateAccessToken(payload: Omit<JwtPayload, 'jti'>) {
+  generateAccessToken(payload: TokenPayload) {
     const accessToken = jwt.sign(
       payload,
       process.env.JWT_ACCESS_SECRET || 'secret_access_token',
@@ -28,7 +19,7 @@ export class JwtService {
     return accessToken;
   }
 
-  async generateRefreshToken(payload: JwtPayload) {
+  async generateRefreshToken(payload: TokenPayload) {
     const refreshTokenRecord = await this.prisma.token.create({
       data: {
         userId: payload.userId,
@@ -48,7 +39,7 @@ export class JwtService {
   }
 
   verifyToken(token: string, secret: string) {
-    const decoded = jwt.verify(token, secret) as JwtPayload;
+    const decoded = jwt.verify(token, secret) as TokenPayload;
     if (!decoded) {
       throw new UnauthorizedException('Invalid token');
     }
@@ -118,12 +109,12 @@ export class JwtService {
 
     const accessToken = this.generateAccessToken({
       userId: decoded.userId,
-      role: decoded.role,
+      role: decoded.role as Role,
     });
 
     const renewedRefreshToken = await this.generateRefreshToken({
       userId: decoded.userId,
-      role: decoded.role,
+      role: decoded.role as Role,
     });
 
     return { accessToken, renewedRefreshToken };

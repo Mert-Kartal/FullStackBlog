@@ -1,16 +1,19 @@
 import { Role } from '@prisma/client';
-export interface JwtPayload {
-  user: {
-    id: string;
-    username: string;
-    role: Role;
-  };
+export interface TokenPayload {
+  userId: string;
+  role: Role;
+}
+
+export interface RefreshTokenPayload {
+  userId: string;
+  role: Role;
+  jti: string;
 }
 
 declare global {
   namespace Express {
     interface Request {
-      user?: JwtPayload;
+      user?: TokenPayload;
     }
   }
 }
