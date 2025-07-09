@@ -7,7 +7,7 @@ import {
 import { Request } from 'express';
 import { JwtService } from '../jwt/jwt.service';
 
-const secret = process.env.JWT_ACCESS_SECRET || 'access_secret';
+const secret = process.env.JWT_ACCESS_SECRET || 'secret_access_token';
 
 @Injectable()
 export class JwtGuard implements CanActivate {
