@@ -1,12 +1,20 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import * as jwt from 'jsonwebtoken';
 import { PrismaService } from '../prisma/prisma.service';
-import { TokenPayload, RefreshTokenPayload } from '../types/express';
-import { Role } from '@prisma/client';
+import { TokenPayload } from '../types/express.d';
 
 @Injectable()
 export class JwtService {
   constructor(private readonly prisma: PrismaService) {}
+
+  private extractTokenFromHeader(authorizationHeader: string): string {
+    if (!authorizationHeader || !authorizationHeader.startsWith('Bearer ')) {
+      throw new UnauthorizedException(
+        'Invalid or missing Authorization header',
+      );
+    }
+    return authorizationHeader.split(' ')[1];
+  }
 
   generateAccessToken(payload: TokenPayload) {
     const accessToken = jwt.sign(
@@ -39,18 +47,25 @@ export class JwtService {
   }
 
   verifyToken(token: string, secret: string) {
-    const decoded = jwt.verify(token, secret) as TokenPayload;
-    if (!decoded) {
+    try {
+      const decoded = jwt.verify(token, secret) as TokenPayload;
+      if (!decoded) {
+        throw new UnauthorizedException('Invalid token');
+      }
+      return decoded;
+    } catch (error) {
+      console.log((error as Error).message);
       throw new UnauthorizedException('Invalid token');
     }
-    return decoded;
   }
 
-  async logout(refreshToken: string) {
+  async logout(authorizationHeader: string) {
+    const refreshToken = this.extractTokenFromHeader(authorizationHeader);
+
     const decoded = this.verifyToken(
       refreshToken,
       process.env.JWT_REFRESH_SECRET || 'secret_refresh_token',
-    ) as RefreshTokenPayload;
+    );
 
     const token = await this.prisma.token.findUnique({
       where: {
@@ -83,11 +98,13 @@ export class JwtService {
     };
   }
 
-  async refresh(refreshToken: string) {
+  async refresh(authorizationHeader: string) {
+    const refreshToken = this.extractTokenFromHeader(authorizationHeader);
+
     const decoded = this.verifyToken(
       refreshToken,
       process.env.JWT_REFRESH_SECRET || 'secret_refresh_token',
-    ) as RefreshTokenPayload;
+    );
 
     const token = await this.prisma.token.findUnique({
       where: {
@@ -109,12 +126,21 @@ export class JwtService {
 
     const accessToken = this.generateAccessToken({
       userId: decoded.userId,
-      role: decoded.role as Role,
+      role: decoded.role,
     });
 
     const renewedRefreshToken = await this.generateRefreshToken({
       userId: decoded.userId,
-      role: decoded.role as Role,
+      role: decoded.role,
+    });
+
+    await this.prisma.token.update({
+      where: {
+        id: token.id,
+      },
+      data: {
+        revokedAt: new Date(),
+      },
     });
 
     return { accessToken, renewedRefreshToken };
