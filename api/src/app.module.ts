@@ -8,6 +8,7 @@ import { PostModule } from './post/post.module';
 import { TagModule } from './tag/tag.module';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
+import { JwtModule } from './jwt/jwt.module';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { UserModule } from './user/user.module';
     TagModule,
     AuthModule,
     UserModule,
+    JwtModule,
   ],
   controllers: [AppController],
   providers: [AppService],
