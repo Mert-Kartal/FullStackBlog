@@ -15,11 +15,19 @@ export class TagService {
     if (existTag) {
       throw new BadRequestException('Tag already exists');
     }
-    return this.tagRepository.createTag(data);
+    const createdTag = await this.tagRepository.createTag(data);
+    return {
+      message: 'Tag created successfully',
+      data: createdTag,
+    };
   }
 
   async getTags() {
-    return this.tagRepository.getTags();
+    const tags = await this.tagRepository.getTags();
+    return {
+      message: 'Tags fetched successfully',
+      data: tags,
+    };
   }
 
   async getTagById(id: string) {
@@ -27,7 +35,10 @@ export class TagService {
     if (!existTag) {
       throw new NotFoundException('Tag not found');
     }
-    return existTag;
+    return {
+      message: 'Tag fetched successfully',
+      data: existTag,
+    };
   }
 
   async updateTag(id: string, data: UpdateTagDto) {
@@ -42,7 +53,11 @@ export class TagService {
     if (existTagByName) {
       throw new BadRequestException('Tag already exists');
     }
-    return this.tagRepository.updateTag(id, data);
+    const updatedTag = await this.tagRepository.updateTag(id, data);
+    return {
+      message: 'Tag updated successfully',
+      data: updatedTag,
+    };
   }
 
   async deleteTag(id: string) {

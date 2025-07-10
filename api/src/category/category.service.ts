@@ -18,11 +18,19 @@ export class CategoryService {
       throw new BadRequestException('Category already exists');
     }
 
-    return this.categoryRepository.createCategory(data);
+    const createdCategory = await this.categoryRepository.createCategory(data);
+    return {
+      message: 'Category created successfully',
+      data: createdCategory,
+    };
   }
 
   async getCategories() {
-    return this.categoryRepository.getCategories();
+    const categories = await this.categoryRepository.getCategories();
+    return {
+      message: 'Categories fetched successfully',
+      data: categories,
+    };
   }
 
   async getCategoryById(id: string) {
@@ -30,7 +38,10 @@ export class CategoryService {
     if (!existCategory) {
       throw new NotFoundException('Category not found');
     }
-    return existCategory;
+    return {
+      message: 'Category fetched successfully',
+      data: existCategory,
+    };
   }
 
   async updateCategory(id: string, data: UpdateCategoryDto) {
@@ -47,7 +58,11 @@ export class CategoryService {
     if (existCategoryByName) {
       throw new BadRequestException('Category already exists');
     }
-    return this.categoryRepository.updateCategory(id, data);
+    const updatedCategory = this.categoryRepository.updateCategory(id, data);
+    return {
+      message: 'Category updated successfully',
+      data: updatedCategory,
+    };
   }
 
   async deleteCategory(id: string) {

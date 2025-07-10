@@ -143,7 +143,11 @@ export class JwtService {
       role: decoded.role,
     });
 
-    return { accessToken, renewedRefreshToken };
+    return {
+      message: 'Token refreshed successfully',
+      accessToken,
+      renewedRefreshToken,
+    };
   }
 
   async logoutAll(authorizationHeader: string) {
@@ -162,5 +166,9 @@ export class JwtService {
         revokedAt: new Date(),
       },
     });
+
+    return {
+      message: 'Logged out from all devices successfully',
+    };
   }
 }

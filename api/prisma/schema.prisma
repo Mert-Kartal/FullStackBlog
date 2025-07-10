@@ -64,7 +64,7 @@ model Post {
   comment  Comment[]
 
   tag  PostTag[]
-  user User      @relation(fields: [userId], references: [id])
+  user User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([title])
   @@map("posts")
@@ -83,7 +83,7 @@ model PostTag {
   postId String
   tagId  String
   tag    Tag    @relation(fields: [tagId], references: [id])
-  post   Post   @relation(fields: [postId], references: [id])
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
 
   @@id([postId, tagId])
   @@map("post_tags")
@@ -98,8 +98,8 @@ model Comment {
   updatedAt DateTime  @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
 
-  post Post @relation(fields: [postId], references: [id])
-  user User @relation(fields: [userId], references: [id])
+  post Post @relation(fields: [postId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([postId])

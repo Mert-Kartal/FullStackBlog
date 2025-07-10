@@ -33,6 +33,7 @@ export class AuthService {
     });
 
     return {
+      message: 'User registered successfully',
       data: {
         id: createdUser.id,
         username: createdUser.username,
@@ -65,6 +66,7 @@ export class AuthService {
     });
 
     return {
+      message: 'User logged in successfully',
       data: {
         id: user.id,
         username: user.username,

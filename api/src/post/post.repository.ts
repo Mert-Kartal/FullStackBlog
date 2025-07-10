@@ -53,6 +53,7 @@ export class PostRepository {
       data,
       include: {
         category: true,
+        tag: true,
       },
     });
   }
@@ -64,6 +65,12 @@ export class PostRepository {
       include: {
         category: true,
       },
+    });
+  }
+
+  async addTagToPost(id: string, tagId: string) {
+    return this.prisma.postTag.create({
+      data: { postId: id, tagId },
     });
   }
 }

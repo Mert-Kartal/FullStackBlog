@@ -11,11 +11,19 @@ export class PostService {
   constructor(private readonly postRepository: PostRepository) {}
 
   async createPost(data: CreatePostDto, userId: string) {
-    return this.postRepository.createPost(data, userId);
+    const createdPost = await this.postRepository.createPost(data, userId);
+    return {
+      message: 'Post created successfully',
+      data: createdPost,
+    };
   }
 
   async getPosts() {
-    return this.postRepository.getPosts();
+    const posts = await this.postRepository.getPosts();
+    return {
+      message: 'Posts fetched successfully',
+      data: posts,
+    };
   }
 
   async getPostById(id: string) {
@@ -23,7 +31,10 @@ export class PostService {
     if (!existPost) {
       throw new NotFoundException('Post not found');
     }
-    return existPost;
+    return {
+      message: 'Post fetched successfully',
+      data: existPost,
+    };
   }
 
   async updatePost(id: string, data: UpdatePostDto) {
@@ -40,7 +51,11 @@ export class PostService {
     if (!existPost) {
       throw new NotFoundException('Post not found');
     }
-    return this.postRepository.updatePost(id, data);
+    const updatedPost = await this.postRepository.updatePost(id, data);
+    return {
+      message: 'Post updated successfully',
+      data: updatedPost,
+    };
   }
 
   async deletePost(id: string) {

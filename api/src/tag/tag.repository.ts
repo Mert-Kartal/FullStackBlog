@@ -38,6 +38,9 @@ export class TagRepository {
     return this.prisma.tag.update({
       where: { id },
       data,
+      include: {
+        post: true,
+      },
     });
   }
 
