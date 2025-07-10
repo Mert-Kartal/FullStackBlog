@@ -50,6 +50,7 @@ export class TagService {
     if (!existTag) {
       throw new NotFoundException('Tag not found');
     }
-    return this.tagRepository.deleteTag(id);
+    await this.tagRepository.deleteTag(id);
+    return { message: 'Tag deleted successfully' };
   }
 }

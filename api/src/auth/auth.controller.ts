@@ -25,4 +25,9 @@ export class AuthController {
   async refresh(@Headers('authorization') authorization: string) {
     return this.authService.refresh(authorization);
   }
+
+  @Post('logout-all')
+  async logoutAll(@Headers('authorization') authorization: string) {
+    return this.authService.logoutAll(authorization);
+  }
 }

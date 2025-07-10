@@ -145,4 +145,22 @@ export class JwtService {
 
     return { accessToken, renewedRefreshToken };
   }
+
+  async logoutAll(authorizationHeader: string) {
+    const refreshToken = this.extractTokenFromHeader(authorizationHeader);
+
+    const decoded = this.verifyToken(
+      refreshToken,
+      process.env.JWT_REFRESH_SECRET || 'secret_refresh_token',
+    );
+
+    await this.prisma.token.updateMany({
+      where: {
+        userId: decoded.userId,
+      },
+      data: {
+        revokedAt: new Date(),
+      },
+    });
+  }
 }

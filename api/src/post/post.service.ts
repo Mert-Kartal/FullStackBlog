@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { PostRepository } from './post.repository';
 import { CreatePostDto, UpdatePostDto } from '../dto/post.dto';
 
@@ -23,6 +27,15 @@ export class PostService {
   }
 
   async updatePost(id: string, data: UpdatePostDto) {
+    const hasData =
+      data.title !== undefined ||
+      data.content !== undefined ||
+      data.categoryId !== undefined;
+
+    if (!hasData) {
+      throw new BadRequestException('No data provided');
+    }
+
     const existPost = await this.postRepository.getPostById(id);
     if (!existPost) {
       throw new NotFoundException('Post not found');
@@ -35,6 +48,7 @@ export class PostService {
     if (!existPost) {
       throw new NotFoundException('Post not found');
     }
-    return this.postRepository.deletePost(id);
+    await this.postRepository.deletePost(id);
+    return { message: 'Post deleted successfully' };
   }
 }

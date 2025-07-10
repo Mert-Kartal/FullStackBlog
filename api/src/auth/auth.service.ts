@@ -83,4 +83,8 @@ export class AuthService {
   async refresh(refreshToken: string) {
     return this.jwtService.refresh(refreshToken);
   }
+
+  async logoutAll(authorizationHeader: string) {
+    return this.jwtService.logoutAll(authorizationHeader);
+  }
 }
