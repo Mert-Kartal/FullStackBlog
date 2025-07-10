@@ -20,7 +20,11 @@ export class PostRepository {
       where: { title, deletedAt: null },
       include: {
         category: true,
-        tag: true,
+        tag: {
+          include: {
+            tag: true,
+          },
+        },
       },
     });
   }
@@ -32,7 +36,11 @@ export class PostRepository {
       },
       include: {
         category: true,
-        tag: true,
+        tag: {
+          include: {
+            tag: true,
+          },
+        },
       },
     });
   }
@@ -42,7 +50,11 @@ export class PostRepository {
       where: { id, deletedAt: null },
       include: {
         category: true,
-        tag: true,
+        tag: {
+          include: {
+            tag: true,
+          },
+        },
       },
     });
   }
@@ -53,7 +65,11 @@ export class PostRepository {
       data,
       include: {
         category: true,
-        tag: true,
+        tag: {
+          include: {
+            tag: true,
+          },
+        },
       },
     });
   }
@@ -71,6 +87,10 @@ export class PostRepository {
   async addTagToPost(id: string, tagId: string) {
     return this.prisma.postTag.create({
       data: { postId: id, tagId },
+      include: {
+        tag: true,
+        post: true,
+      },
     });
   }
 

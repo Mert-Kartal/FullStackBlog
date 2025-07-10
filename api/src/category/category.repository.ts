@@ -15,6 +15,9 @@ export class CategoryRepository {
   async getCategoryByName(name: string) {
     return this.prisma.category.findUnique({
       where: { name, deletedAt: null },
+      include: {
+        posts: true,
+      },
     });
   }
 
@@ -29,6 +32,9 @@ export class CategoryRepository {
   async getCategoryById(id: string) {
     return this.prisma.category.findUnique({
       where: { id, deletedAt: null },
+      include: {
+        posts: true,
+      },
     });
   }
 

@@ -16,7 +16,11 @@ export class TagRepository {
     return this.prisma.tag.findUnique({
       where: { name },
       include: {
-        post: true,
+        post: {
+          include: {
+            post: true,
+          },
+        },
       },
     });
   }
@@ -29,7 +33,11 @@ export class TagRepository {
     return this.prisma.tag.findUnique({
       where: { id },
       include: {
-        post: true,
+        post: {
+          include: {
+            post: true,
+          },
+        },
       },
     });
   }
@@ -39,7 +47,11 @@ export class TagRepository {
       where: { id },
       data,
       include: {
-        post: true,
+        post: {
+          include: {
+            post: true,
+          },
+        },
       },
     });
   }

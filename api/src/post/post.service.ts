@@ -87,7 +87,6 @@ export class PostService {
       throw new NotFoundException('Post not found');
     }
     const existTag = await this.tagService.getTagById(tagId);
-    console.log(existTag);
     if (!existTag) {
       throw new NotFoundException('Tag not found');
     }
