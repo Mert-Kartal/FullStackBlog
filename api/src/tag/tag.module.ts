@@ -8,5 +8,6 @@ import { JwtModule } from '../jwt/jwt.module';
   imports: [PrismaModule, JwtModule],
   controllers: [TagController],
   providers: [TagService, TagRepository],
+  exports: [TagService],
 })
 export class TagModule {}

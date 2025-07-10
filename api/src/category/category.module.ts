@@ -8,5 +8,6 @@ import { JwtModule } from '../jwt/jwt.module';
   imports: [PrismaModule, JwtModule],
   providers: [CategoryService, CategoryRepository],
   controllers: [CategoryController],
+  exports: [CategoryService],
 })
 export class CategoryModule {}

@@ -24,6 +24,9 @@ export class TagService {
 
   async getTags() {
     const tags = await this.tagRepository.getTags();
+    if (tags.length === 0) {
+      throw new NotFoundException('Tags not found');
+    }
     return {
       message: 'Tags fetched successfully',
       data: tags,

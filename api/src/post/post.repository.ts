@@ -73,4 +73,10 @@ export class PostRepository {
       data: { postId: id, tagId },
     });
   }
+
+  async removeTagFromPost(id: string, tagId: string) {
+    return this.prisma.postTag.delete({
+      where: { postId_tagId: { postId: id, tagId } },
+    });
+  }
 }

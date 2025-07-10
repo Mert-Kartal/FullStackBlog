@@ -27,6 +27,9 @@ export class CategoryService {
 
   async getCategories() {
     const categories = await this.categoryRepository.getCategories();
+    if (categories.length === 0) {
+      throw new NotFoundException('Categories not found');
+    }
     return {
       message: 'Categories fetched successfully',
       data: categories,

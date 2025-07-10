@@ -49,4 +49,22 @@ export class PostController {
   async deletePost(@Param('id', ParseUUIDPipe) id: string) {
     return this.postService.deletePost(id);
   }
+
+  @UseGuards(JwtGuard)
+  @Post(':id/tags/:tagId')
+  async addTagToPost(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('tagId', ParseUUIDPipe) tagId: string,
+  ) {
+    return this.postService.addTagToPost(id, tagId);
+  }
+
+  @UseGuards(JwtGuard)
+  @Delete(':id/tags/:tagId')
+  async removeTagFromPost(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('tagId', ParseUUIDPipe) tagId: string,
+  ) {
+    return this.postService.removeTagFromPost(id, tagId);
+  }
 }
