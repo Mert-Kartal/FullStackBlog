@@ -6,9 +6,12 @@ import { CreatePostDto, UpdatePostDto } from '../dto/post.dto';
 export class PostRepository {
   constructor(private readonly prisma: PrismaService) {}
 
-  async createPost(data: CreatePostDto) {
+  async createPost(data: CreatePostDto, userId: string) {
     return this.prisma.post.create({
-      data,
+      data: {
+        ...data,
+        userId,
+      },
     });
   }
 

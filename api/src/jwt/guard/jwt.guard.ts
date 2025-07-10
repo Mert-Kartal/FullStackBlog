@@ -5,7 +5,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Request } from 'express';
-import { JwtService } from '../jwt/jwt.service';
+import { JwtService } from '../jwt.service';
 
 const secret = process.env.JWT_ACCESS_SECRET || 'secret_access_token';
 

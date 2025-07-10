@@ -7,17 +7,22 @@ import {
   Post,
   Patch,
   Delete,
+  UseGuards,
+  Req,
 } from '@nestjs/common';
+import { Request } from 'express';
 import { PostService } from './post.service';
 import { CreatePostDto, UpdatePostDto } from '../dto/post.dto';
+import { JwtGuard } from '../jwt/guard/jwt.guard';
 
-@Controller('post')
+@Controller('posts')
 export class PostController {
   constructor(private readonly postService: PostService) {}
 
+  @UseGuards(JwtGuard)
   @Post()
-  async createPost(@Body() data: CreatePostDto) {
-    return this.postService.createPost(data);
+  async createPost(@Body() data: CreatePostDto, @Req() req: Request) {
+    return this.postService.createPost(data, req.user!.userId);
   }
 
   @Get()
@@ -30,6 +35,7 @@ export class PostController {
     return this.postService.getPostById(id);
   }
 
+  @UseGuards(JwtGuard)
   @Patch(':id')
   async updatePost(
     @Param('id', ParseUUIDPipe) id: string,
@@ -38,6 +44,7 @@ export class PostController {
     return this.postService.updatePost(id, data);
   }
 
+  @UseGuards(JwtGuard)
   @Delete(':id')
   async deletePost(@Param('id', ParseUUIDPipe) id: string) {
     return this.postService.deletePost(id);

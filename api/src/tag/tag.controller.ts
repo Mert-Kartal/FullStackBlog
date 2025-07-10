@@ -7,14 +7,17 @@ import {
   ParseUUIDPipe,
   Patch,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { TagService } from './tag.service';
 import { CreateTagDto, UpdateTagDto } from '../dto/tag.dto';
+import { JwtGuard } from '../jwt/guard/jwt.guard';
 
-@Controller('tag')
+@Controller('tags')
 export class TagController {
   constructor(private readonly tagService: TagService) {}
 
+  @UseGuards(JwtGuard)
   @Post()
   async createTag(@Body() data: CreateTagDto) {
     return this.tagService.createTag(data);
@@ -30,6 +33,7 @@ export class TagController {
     return this.tagService.getTagById(id);
   }
 
+  @UseGuards(JwtGuard)
   @Patch(':id')
   async updateTag(
     @Param('id', ParseUUIDPipe) id: string,
@@ -38,6 +42,7 @@ export class TagController {
     return this.tagService.updateTag(id, data);
   }
 
+  @UseGuards(JwtGuard)
   @Delete(':id')
   async deleteTag(@Param('id', ParseUUIDPipe) id: string) {
     return this.tagService.deleteTag(id);

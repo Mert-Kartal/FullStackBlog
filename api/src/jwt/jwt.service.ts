@@ -124,6 +124,15 @@ export class JwtService {
       throw new UnauthorizedException('Token has been revoked');
     }
 
+    await this.prisma.token.update({
+      where: {
+        id: token.id,
+      },
+      data: {
+        revokedAt: new Date(),
+      },
+    });
+
     const accessToken = this.generateAccessToken({
       userId: decoded.userId,
       role: decoded.role,
@@ -132,15 +141,6 @@ export class JwtService {
     const renewedRefreshToken = await this.generateRefreshToken({
       userId: decoded.userId,
       role: decoded.role,
-    });
-
-    await this.prisma.token.update({
-      where: {
-        id: token.id,
-      },
-      data: {
-        revokedAt: new Date(),
-      },
     });
 
     return { accessToken, renewedRefreshToken };

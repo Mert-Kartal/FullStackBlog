@@ -6,8 +6,8 @@ import { CreatePostDto, UpdatePostDto } from '../dto/post.dto';
 export class PostService {
   constructor(private readonly postRepository: PostRepository) {}
 
-  async createPost(data: CreatePostDto) {
-    return this.postRepository.createPost(data);
+  async createPost(data: CreatePostDto, userId: string) {
+    return this.postRepository.createPost(data, userId);
   }
 
   async getPosts() {
