@@ -10,11 +10,21 @@ import { CreateTagDto, UpdateTagDto } from '../dto/tag.dto';
 export class TagService {
   constructor(private readonly tagRepository: TagRepository) {}
 
-  async createTag(data: CreateTagDto) {
-    const existTag = await this.tagRepository.getTagByName(data.name);
+  async checkTagByName(name: string) {
+    const existTag = await this.tagRepository.getTagByName(name);
     if (existTag) {
       throw new BadRequestException('Tag already exists');
     }
+  }
+
+  async checkTagById(id: string) {
+    const tag = await this.tagRepository.getTagById(id);
+    return tag ? tag : null;
+  }
+
+  async createTag(data: CreateTagDto) {
+    await this.checkTagByName(data.name);
+
     const createdTag = await this.tagRepository.createTag(data);
     return {
       message: 'Tag created successfully',
@@ -34,7 +44,8 @@ export class TagService {
   }
 
   async getTagById(id: string) {
-    const existTag = await this.tagRepository.getTagById(id);
+    const existTag = await this.checkTagById(id);
+
     if (!existTag) {
       throw new NotFoundException('Tag not found');
     }
@@ -45,17 +56,17 @@ export class TagService {
   }
 
   async updateTag(id: string, data: UpdateTagDto) {
-    const existTag = await this.tagRepository.getTagById(id);
+    const existTag = await this.checkTagById(id);
+
     if (!existTag) {
       throw new NotFoundException('Tag not found');
     }
     if (data.name === existTag.name) {
       throw new BadRequestException('Tag name is the same as before');
     }
-    const existTagByName = await this.tagRepository.getTagByName(data.name);
-    if (existTagByName) {
-      throw new BadRequestException('Tag already exists');
-    }
+
+    await this.checkTagByName(data.name);
+
     const updatedTag = await this.tagRepository.updateTag(id, data);
     return {
       message: 'Tag updated successfully',
@@ -64,7 +75,8 @@ export class TagService {
   }
 
   async deleteTag(id: string) {
-    const existTag = await this.tagRepository.getTagById(id);
+    const existTag = await this.checkTagById(id);
+
     if (!existTag) {
       throw new NotFoundException('Tag not found');
     }

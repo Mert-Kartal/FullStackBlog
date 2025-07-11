@@ -10,13 +10,15 @@ import { CreateCategoryDto, UpdateCategoryDto } from '../dto/category.dto';
 export class CategoryService {
   constructor(private readonly categoryRepository: CategoryRepository) {}
 
-  async createCategory(data: CreateCategoryDto) {
-    const existCategory = await this.categoryRepository.getCategoryByName(
-      data.name,
-    );
+  async checkCategoryByName(name: string) {
+    const existCategory = await this.categoryRepository.getCategoryByName(name);
     if (existCategory) {
       throw new BadRequestException('Category already exists');
     }
+  }
+
+  async createCategory(data: CreateCategoryDto) {
+    await this.checkCategoryByName(data.name);
 
     const createdCategory = await this.categoryRepository.createCategory(data);
     return {
@@ -38,7 +40,7 @@ export class CategoryService {
 
   async getCategoryById(id: string) {
     const existCategory = await this.categoryRepository.getCategoryById(id);
-    if (!existCategory) {
+    if (!existCategory || existCategory.deletedAt) {
       throw new NotFoundException('Category not found');
     }
     return {
@@ -48,19 +50,14 @@ export class CategoryService {
   }
 
   async updateCategory(id: string, data: UpdateCategoryDto) {
-    const existCategory = await this.categoryRepository.getCategoryById(id);
-    if (!existCategory) {
-      throw new NotFoundException('Category not found');
-    }
-    if (data.name === existCategory.name) {
+    const existCategory = await this.getCategoryById(id);
+
+    if (data.name === existCategory.data.name) {
       throw new BadRequestException('Category name is the same as before');
     }
-    const existCategoryByName = await this.categoryRepository.getCategoryByName(
-      data.name,
-    );
-    if (existCategoryByName) {
-      throw new BadRequestException('Category already exists');
-    }
+
+    await this.checkCategoryByName(data.name);
+
     const updatedCategory = this.categoryRepository.updateCategory(id, data);
     return {
       message: 'Category updated successfully',
@@ -69,10 +66,8 @@ export class CategoryService {
   }
 
   async deleteCategory(id: string) {
-    const existCategory = await this.categoryRepository.getCategoryById(id);
-    if (!existCategory) {
-      throw new NotFoundException('Category not found');
-    }
+    await this.getCategoryById(id);
+
     await this.categoryRepository.deleteCategory(id);
     return { message: 'Category deleted successfully' };
   }

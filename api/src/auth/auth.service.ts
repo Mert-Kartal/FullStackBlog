@@ -11,11 +11,18 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
+  async checkUserByUsername(username: string) {
+    const user = await this.userRepository.getByUsername(username);
+    return user ? user : null;
+  }
+
   async register(data: RegisterUserDto) {
-    const user = await this.userRepository.getByUsername(data.username);
+    const user = await this.checkUserByUsername(data.username);
+
     if (user) {
       throw new BadRequestException('User already exists');
     }
+
     const hashedPassword = await bcrypt.hash(data.password, 10);
     const createdUser = await this.userRepository.createUser({
       ...data,
@@ -46,10 +53,12 @@ export class AuthService {
   }
 
   async login(data: LoginUserDto) {
-    const user = await this.userRepository.getByUsername(data.username);
-    if (!user) {
+    const user = await this.checkUserByUsername(data.username);
+
+    if (!user || user.deletedAt) {
       throw new BadRequestException('User not found');
     }
+
     const isPasswordValid = await bcrypt.compare(data.password, user.password);
     if (!isPasswordValid) {
       throw new BadRequestException('Invalid credentials');

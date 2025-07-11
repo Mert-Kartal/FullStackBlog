@@ -9,8 +9,14 @@ import { UpdateUserDto } from '../dto/user.dto';
 export class UserService {
   constructor(private readonly userRepository: UserRepository) {}
 
+  async checkUserById(id: string) {
+    const user = await this.userRepository.getById(id);
+    return user ? user : null;
+  }
+
   async updateUser(data: UpdateUserDto, userId: string) {
-    const user = await this.userRepository.getById(userId);
+    const user = await this.checkUserById(userId);
+
     if (!user || user.deletedAt) {
       throw new NotFoundException('User not found');
     }
@@ -32,7 +38,8 @@ export class UserService {
   }
 
   async getUser(userId: string) {
-    const user = await this.userRepository.getById(userId);
+    const user = await this.checkUserById(userId);
+
     if (!user || user.deletedAt) {
       throw new NotFoundException('User not found');
     }

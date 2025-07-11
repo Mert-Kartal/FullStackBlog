@@ -16,12 +16,8 @@ export class PostService {
   ) {}
 
   async createPost(data: CreatePostDto, userId: string) {
-    const existCategory = await this.categoryService.getCategoryById(
-      data.categoryId,
-    );
-    if (!existCategory) {
-      throw new NotFoundException('Category not found');
-    }
+    await this.categoryService.getCategoryById(data.categoryId);
+
     const createdPost = await this.postRepository.createPost(data, userId);
     return {
       message: 'Post created successfully',
@@ -42,7 +38,7 @@ export class PostService {
 
   async getPostById(id: string) {
     const existPost = await this.postRepository.getPostById(id);
-    if (!existPost) {
+    if (!existPost || existPost.deletedAt) {
       throw new NotFoundException('Post not found');
     }
     return {
@@ -61,10 +57,8 @@ export class PostService {
       throw new BadRequestException('No data provided');
     }
 
-    const existPost = await this.postRepository.getPostById(id);
-    if (!existPost) {
-      throw new NotFoundException('Post not found');
-    }
+    await this.getPostById(id);
+
     const updatedPost = await this.postRepository.updatePost(id, data);
     return {
       message: 'Post updated successfully',
@@ -73,23 +67,16 @@ export class PostService {
   }
 
   async deletePost(id: string) {
-    const existPost = await this.postRepository.getPostById(id);
-    if (!existPost) {
-      throw new NotFoundException('Post not found');
-    }
+    await this.getPostById(id);
+
     await this.postRepository.deletePost(id);
     return { message: 'Post deleted successfully' };
   }
 
   async addTagToPost(id: string, tagId: string) {
-    const existPost = await this.postRepository.getPostById(id);
-    if (!existPost) {
-      throw new NotFoundException('Post not found');
-    }
-    const existTag = await this.tagService.getTagById(tagId);
-    if (!existTag) {
-      throw new NotFoundException('Tag not found');
-    }
+    await this.getPostById(id);
+
+    await this.tagService.getTagById(tagId);
 
     const addedTag = await this.postRepository.addTagToPost(id, tagId);
     return {
@@ -99,14 +86,10 @@ export class PostService {
   }
 
   async removeTagFromPost(id: string, tagId: string) {
-    const existPost = await this.postRepository.getPostById(id);
-    if (!existPost) {
-      throw new NotFoundException('Post not found');
-    }
-    const existTag = await this.tagService.getTagById(tagId);
-    if (!existTag) {
-      throw new NotFoundException('Tag not found');
-    }
+    await this.getPostById(id);
+
+    await this.tagService.getTagById(tagId);
+
     await this.postRepository.removeTagFromPost(id, tagId);
     return {
       message: 'Tag removed from post successfully',
