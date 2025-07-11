@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { PostController } from './post.controller';
 import { PostService } from './post.service';
 import { PostRepository } from './post.repository';
@@ -8,7 +8,13 @@ import { TagModule } from '../tag/tag.module';
 import { CategoryModule } from '../category/category.module';
 import { CommentModule } from '../comment/comment.module';
 @Module({
-  imports: [PrismaModule, JwtModule, TagModule, CategoryModule, CommentModule],
+  imports: [
+    PrismaModule,
+    JwtModule,
+    TagModule,
+    CategoryModule,
+    forwardRef(() => CommentModule),
+  ],
   controllers: [PostController],
   providers: [PostService, PostRepository],
   exports: [PostService],
