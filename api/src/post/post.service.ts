@@ -7,6 +7,7 @@ import { PostRepository } from './post.repository';
 import { CreatePostDto, UpdatePostDto } from '../dto/post.dto';
 import { TagService } from '../tag/tag.service';
 import { CategoryService } from '../category/category.service';
+
 @Injectable()
 export class PostService {
   constructor(
