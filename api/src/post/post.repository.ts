@@ -84,6 +84,12 @@ export class PostRepository {
     });
   }
 
+  async getPostExistTags(id: string) {
+    return this.prisma.postTag.findMany({
+      where: { postId: id },
+    });
+  }
+
   async addTagToPost(id: string, tagId: string) {
     return this.prisma.postTag.create({
       data: { postId: id, tagId },

@@ -1,7 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { CommentRepository } from './comment.repository';
-import { CreateCommentDto, UpdateCommentDto } from '../dto/comment.dto';
-import { PostService } from '../post/post.service';
+import { CreateCommentDto, UpdateCommentDto } from '../../dto/comment.dto';
+import { PostService } from '../post.service';
 
 @Injectable()
 export class CommentService {
@@ -49,7 +53,7 @@ export class CommentService {
     await this.checkPost(postId);
 
     const comment = await this.commentRepository.getCommentById(id, postId);
-    if (!comment) {
+    if (!comment || comment.deletedAt) {
       throw new NotFoundException('Comment not found');
     }
 
@@ -60,7 +64,11 @@ export class CommentService {
   }
 
   async updateComment(id: string, postId: string, data: UpdateCommentDto) {
-    await this.getCommentById(id, postId);
+    const existComment = await this.getCommentById(id, postId);
+
+    if (data.content === existComment.data.content) {
+      throw new BadRequestException('Input data is the same as before');
+    }
 
     const comment = await this.commentRepository.updateComment(
       id,

@@ -14,8 +14,8 @@ import { Request } from 'express';
 import { PostService } from './post.service';
 import { CreatePostDto, UpdatePostDto } from '../dto/post.dto';
 import { JwtGuard } from '../jwt/guard/jwt.guard';
-import { CommentService } from '../comment/comment.service';
-import { CreateCommentDto, UpdateCommentDto } from 'src/dto/comment.dto';
+import { CommentService } from './comment/comment.service';
+import { CreateCommentDto, UpdateCommentDto } from '../dto/comment.dto';
 
 @Controller('posts')
 export class PostController {

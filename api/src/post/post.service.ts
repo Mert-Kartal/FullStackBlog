@@ -15,6 +15,11 @@ export class PostService {
     private readonly tagService: TagService,
     private readonly categoryService: CategoryService,
   ) {}
+  private async checkPostExistTags(id: string) {
+    const postsExistTags = await this.postRepository.getPostExistTags(id);
+
+    return postsExistTags;
+  }
 
   async createPost(data: CreatePostDto, userId: string) {
     await this.categoryService.getCategoryById(data.categoryId);
@@ -49,6 +54,7 @@ export class PostService {
   }
 
   async updatePost(id: string, data: UpdatePostDto) {
+    const existPost = await this.getPostById(id);
     const hasData =
       data.title !== undefined ||
       data.content !== undefined ||
@@ -58,7 +64,16 @@ export class PostService {
       throw new BadRequestException('No data provided');
     }
 
-    await this.getPostById(id);
+    if (existPost.data.categoryId !== data.categoryId) {
+      await this.categoryService.getCategoryById(existPost.data.categoryId);
+    }
+
+    if (
+      (data.content && existPost.data.content === data.content) ||
+      (data.title && existPost.data.title === data.title)
+    ) {
+      throw new BadRequestException('Input data is the same as before');
+    }
 
     const updatedPost = await this.postRepository.updatePost(id, data);
     return {
@@ -79,6 +94,12 @@ export class PostService {
 
     await this.tagService.getTagById(tagId);
 
+    const postsExistTags = await this.checkPostExistTags(id);
+
+    if (postsExistTags.some((tag) => tag.tagId === tagId)) {
+      throw new BadRequestException('Tag already exists in post');
+    }
+
     const addedTag = await this.postRepository.addTagToPost(id, tagId);
     return {
       message: 'Tag added to post successfully',
@@ -90,6 +111,11 @@ export class PostService {
     await this.getPostById(id);
 
     await this.tagService.getTagById(tagId);
+    const postsExistTags = await this.checkPostExistTags(id);
+
+    if (postsExistTags.some((tag) => tag.tagId !== tagId)) {
+      throw new BadRequestException('Tag not exist in post');
+    }
 
     await this.postRepository.removeTagFromPost(id, tagId);
     return {

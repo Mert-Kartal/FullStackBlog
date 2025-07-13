@@ -58,7 +58,10 @@ export class CategoryService {
 
     await this.checkCategoryByName(data.name);
 
-    const updatedCategory = this.categoryRepository.updateCategory(id, data);
+    const updatedCategory = await this.categoryRepository.updateCategory(
+      id,
+      data,
+    );
     return {
       message: 'Category updated successfully',
       data: updatedCategory,

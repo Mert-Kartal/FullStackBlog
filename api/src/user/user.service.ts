@@ -25,8 +25,14 @@ export class UserService {
     if (Object.keys(data).length === 0) {
       throw new BadRequestException('No data to update');
     }
+    if (
+      (data.name && data.name === user.name) ||
+      (data.username && data.username === user.username)
+    ) {
+      throw new BadRequestException('Input data is the same as before');
+    }
 
-    if (user.username !== data.username && data.username) {
+    if (data.username) {
       const existUserName = await this.userRepository.getByUsername(
         data.username,
       );
