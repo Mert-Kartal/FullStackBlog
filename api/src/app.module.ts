@@ -9,6 +9,7 @@ import { TagModule } from './tag/tag.module';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { JwtModule } from './jwt/jwt.module';
+import { SharedModule } from './shared/shared.module';
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { JwtModule } from './jwt/jwt.module';
     AuthModule,
     UserModule,
     JwtModule,
+    SharedModule,
   ],
   controllers: [AppController],
   providers: [AppService],

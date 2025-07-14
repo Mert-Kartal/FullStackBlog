@@ -21,8 +21,9 @@ export class UserService {
     if (!user || user.deletedAt) {
       throw new NotFoundException('User not found');
     }
+    const hasData = data.name !== undefined || data.username !== undefined;
 
-    if (Object.keys(data).length === 0) {
+    if (!hasData) {
       throw new BadRequestException('No data to update');
     }
     if (
@@ -41,7 +42,8 @@ export class UserService {
       }
     }
     const updatedUser = await this.userRepository.updateUser(userId, data);
-    return { message: 'User updated successfully', data: updatedUser };
+    const { password, ...userWithoutPassword } = updatedUser;
+    return { message: 'User updated successfully', data: userWithoutPassword };
   }
 
   async getUser(userId: string) {
@@ -50,6 +52,7 @@ export class UserService {
     if (!user || user.deletedAt) {
       throw new NotFoundException('User not found');
     }
-    return { message: 'User fetched successfully', data: user };
+    const { password, ...userWithoutPassword } = user;
+    return { message: 'User fetched successfully', data: userWithoutPassword };
   }
 }

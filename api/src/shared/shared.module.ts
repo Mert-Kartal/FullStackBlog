@@ -1,8 +1,9 @@
 import { Module } from '@nestjs/common';
 import { JwtGuard, RolesGuard } from './guards';
-import { Roles } from './decorators';
+import { JwtModule } from '../jwt/jwt.module';
 @Module({
+  imports: [JwtModule],
   providers: [JwtGuard, RolesGuard],
-  exports: [JwtGuard, RolesGuard, Roles],
+  exports: [JwtModule, JwtGuard, RolesGuard],
 })
 export class SharedModule {}

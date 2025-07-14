@@ -2,8 +2,8 @@ import { Body, Controller, Get, Patch, Req, UseGuards } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UpdateUserDto } from '../dto/user.dto';
 import { Request } from 'express';
-import { JwtGuard } from '../jwt/guard/jwt.guard';
-@Controller('user')
+import { JwtGuard } from '../shared/guards';
+@Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
   @UseGuards(JwtGuard)

@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto, UpdateCategoryDto } from '../dto/category.dto';
-import { JwtGuard } from '../jwt/guard/jwt.guard';
+import { JwtGuard } from '../shared/guards';
 
 @Controller('categories')
 export class CategoryController {

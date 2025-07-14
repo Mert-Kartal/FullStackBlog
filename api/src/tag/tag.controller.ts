@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { TagService } from './tag.service';
 import { CreateTagDto, UpdateTagDto } from '../dto/tag.dto';
-import { JwtGuard } from '../jwt/guard/jwt.guard';
+import { JwtGuard } from '../shared/guards/';
 
 @Controller('tags')
 export class TagController {
