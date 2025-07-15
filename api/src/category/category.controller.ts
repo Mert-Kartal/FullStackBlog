@@ -11,13 +11,15 @@ import {
 } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto, UpdateCategoryDto } from '../dto/category.dto';
-import { JwtGuard } from '../shared/guards';
-
+import { JwtGuard, RolesGuard } from '../shared/guards';
+import { Roles } from '../shared/decorators';
+import { Role } from '@prisma/client';
 @Controller('categories')
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
-  @UseGuards(JwtGuard)
+  @Roles(Role.ADMIN)
+  @UseGuards(JwtGuard, RolesGuard)
   @Post()
   async createCategory(@Body() data: CreateCategoryDto) {
     return this.categoryService.createCategory(data);
@@ -33,7 +35,8 @@ export class CategoryController {
     return this.categoryService.getCategoryById(id);
   }
 
-  @UseGuards(JwtGuard)
+  @Roles(Role.ADMIN)
+  @UseGuards(JwtGuard, RolesGuard)
   @Patch(':id')
   async updateCategory(
     @Param('id', ParseUUIDPipe) id: string,
@@ -42,7 +45,8 @@ export class CategoryController {
     return this.categoryService.updateCategory(id, data);
   }
 
-  @UseGuards(JwtGuard)
+  @Roles(Role.ADMIN)
+  @UseGuards(JwtGuard, RolesGuard)
   @Delete(':id')
   async deleteCategory(@Param('id', ParseUUIDPipe) id: string) {
     return this.categoryService.deleteCategory(id);
