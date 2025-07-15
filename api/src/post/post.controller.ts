@@ -42,6 +42,16 @@ export class PostController {
     return this.postService.getPostById(id);
   }
 
+  @Roles(Role.MODERATOR, Role.ADMIN)
+  @UseGuards(JwtGuard, RolesGuard)
+  @Patch(':id/staff')
+  async updatePostByStaff(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() data: UpdatePostDto,
+  ) {
+    return this.postService.updatePostByStaff(id, data);
+  }
+
   @UseGuards(JwtGuard)
   @Patch(':id')
   async updatePost(
@@ -51,14 +61,12 @@ export class PostController {
   ) {
     return this.postService.updatePost(id, data, req.user!.userId);
   }
-  @Roles(Role.MODERATOR, Role.ADMIN)
+
+  @Roles(Role.ADMIN)
   @UseGuards(JwtGuard, RolesGuard)
-  @Patch(':id')
-  async updatePostByStaff(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Body() data: UpdatePostDto,
-  ) {
-    return this.postService.updatePostByStaff(id, data);
+  @Delete(':id/staff')
+  async deletePostByAdmin(@Param('id', ParseUUIDPipe) id: string) {
+    return this.postService.deletePostByAdmin(id);
   }
 
   @UseGuards(JwtGuard)
@@ -70,11 +78,14 @@ export class PostController {
     return this.postService.deletePost(id, req.user!.userId);
   }
 
-  @Roles(Role.ADMIN)
+  @Roles(Role.MODERATOR, Role.ADMIN)
   @UseGuards(JwtGuard, RolesGuard)
-  @Delete(':id')
-  async deletePostByAdmin(@Param('id', ParseUUIDPipe) id: string) {
-    return this.postService.deletePostByAdmin(id);
+  @Post(':id/tags/:tagId/staff')
+  async addTagToPostByStaff(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('tagId', ParseUUIDPipe) tagId: string,
+  ) {
+    return this.postService.addTagToPostByStaff(id, tagId);
   }
 
   @UseGuards(JwtGuard)
@@ -82,8 +93,9 @@ export class PostController {
   async addTagToPost(
     @Param('id', ParseUUIDPipe) id: string,
     @Param('tagId', ParseUUIDPipe) tagId: string,
+    @Req() req: Request,
   ) {
-    return this.postService.addTagToPost(id, tagId);
+    return this.postService.addTagToPost(id, tagId, req.user!.userId);
   }
 
   @UseGuards(JwtGuard)
@@ -91,8 +103,9 @@ export class PostController {
   async removeTagFromPost(
     @Param('id', ParseUUIDPipe) id: string,
     @Param('tagId', ParseUUIDPipe) tagId: string,
+    @Req() req: Request,
   ) {
-    return this.postService.removeTagFromPost(id, tagId);
+    return this.postService.removeTagFromPost(id, tagId, req.user!.userId);
   }
 
   @UseGuards(JwtGuard)
@@ -134,6 +147,16 @@ export class PostController {
     );
   }
 
+  @Roles(Role.ADMIN, Role.MODERATOR)
+  @UseGuards(JwtGuard, RolesGuard)
+  @Delete(':id/comments/:commentId/staff')
+  async deleteCommentByStaff(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('commentId', ParseUUIDPipe) commentId: string,
+  ) {
+    return this.commentService.deleteCommentByStaff(commentId, id);
+  }
+
   @UseGuards(JwtGuard)
   @Delete(':id/comments/:commentId')
   async deleteComment(
@@ -142,15 +165,5 @@ export class PostController {
     @Req() req: Request,
   ) {
     return this.commentService.deleteComment(commentId, id, req.user!.userId);
-  }
-
-  @Roles(Role.ADMIN, Role.MODERATOR)
-  @UseGuards(JwtGuard, RolesGuard)
-  @Delete(':id/comments/:commentId')
-  async deleteCommentByStaff(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Param('commentId', ParseUUIDPipe) commentId: string,
-  ) {
-    return this.commentService.deleteCommentByStaff(commentId, id);
   }
 }

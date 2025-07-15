@@ -68,7 +68,7 @@ export class PostService {
       throw new BadRequestException('No data provided');
     }
 
-    if (existPost.data.categoryId !== data.categoryId) {
+    if (data.categoryId && existPost.data.categoryId !== data.categoryId) {
       await this.categoryService.getCategoryById(existPost.data.categoryId);
     }
 
@@ -98,7 +98,7 @@ export class PostService {
       throw new BadRequestException('No data provided');
     }
 
-    if (existPost.data.categoryId !== data.categoryId) {
+    if (data.categoryId && existPost.data.categoryId !== data.categoryId) {
       await this.categoryService.getCategoryById(existPost.data.categoryId);
     }
 
@@ -131,8 +131,13 @@ export class PostService {
     return { message: 'Post deleted successfully' };
   }
 
-  async addTagToPost(id: string, tagId: string) {
-    await this.getPostById(id);
+  async addTagToPost(id: string, tagId: string, userId: string) {
+    const existPost = await this.getPostById(id);
+    if (existPost.data.userId !== userId) {
+      throw new ForbiddenException(
+        'You are not allowed to add tag to this post',
+      );
+    }
 
     await this.tagService.getTagById(tagId);
 
@@ -149,13 +154,33 @@ export class PostService {
     };
   }
 
-  async removeTagFromPost(id: string, tagId: string) {
+  async addTagToPostByStaff(id: string, tagId: string) {
     await this.getPostById(id);
+    await this.tagService.getTagById(tagId);
+    const postsExistTags = await this.checkPostExistTags(id);
+
+    if (postsExistTags.some((tag) => tag.tagId === tagId)) {
+      throw new BadRequestException('Tag already exists in post');
+    }
+
+    await this.postRepository.addTagToPost(id, tagId);
+    return {
+      message: 'Tag added to post successfully',
+    };
+  }
+
+  async removeTagFromPost(id: string, tagId: string, userId: string) {
+    const existPost = await this.getPostById(id);
+    if (existPost.data.userId !== userId) {
+      throw new ForbiddenException(
+        'You are not allowed to remove tag from this post',
+      );
+    }
 
     await this.tagService.getTagById(tagId);
     const postsExistTags = await this.checkPostExistTags(id);
 
-    if (postsExistTags.some((tag) => tag.tagId !== tagId)) {
+    if (!postsExistTags.some((tag) => tag.tagId !== tagId)) {
       throw new BadRequestException('Tag not exist in post');
     }
 
