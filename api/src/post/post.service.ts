@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -53,8 +54,11 @@ export class PostService {
     };
   }
 
-  async updatePost(id: string, data: UpdatePostDto) {
+  async updatePost(id: string, data: UpdatePostDto, userId: string) {
     const existPost = await this.getPostById(id);
+    if (existPost.data.userId !== userId) {
+      throw new ForbiddenException('You are not allowed to update this post');
+    }
     const hasData =
       data.title !== undefined ||
       data.content !== undefined ||
@@ -82,9 +86,47 @@ export class PostService {
     };
   }
 
-  async deletePost(id: string) {
-    await this.getPostById(id);
+  async updatePostByStaff(id: string, data: UpdatePostDto) {
+    const existPost = await this.getPostById(id);
 
+    const hasData =
+      data.title !== undefined ||
+      data.content !== undefined ||
+      data.categoryId !== undefined;
+
+    if (!hasData) {
+      throw new BadRequestException('No data provided');
+    }
+
+    if (existPost.data.categoryId !== data.categoryId) {
+      await this.categoryService.getCategoryById(existPost.data.categoryId);
+    }
+
+    if (
+      (data.content && existPost.data.content === data.content) ||
+      (data.title && existPost.data.title === data.title)
+    ) {
+      throw new BadRequestException('Input data is the same as before');
+    }
+
+    const updatedPost = await this.postRepository.updatePost(id, data);
+    return {
+      message: 'Post updated successfully',
+      data: updatedPost,
+    };
+  }
+
+  async deletePost(id: string, userId: string) {
+    const existPost = await this.getPostById(id);
+    if (existPost.data.userId !== userId) {
+      throw new ForbiddenException('You are not allowed to delete this post');
+    }
+    await this.postRepository.deletePost(id);
+    return { message: 'Post deleted successfully' };
+  }
+
+  async deletePostByAdmin(id: string) {
+    await this.getPostById(id);
     await this.postRepository.deletePost(id);
     return { message: 'Post deleted successfully' };
   }

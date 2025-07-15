@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -63,9 +64,19 @@ export class CommentService {
     };
   }
 
-  async updateComment(id: string, postId: string, data: UpdateCommentDto) {
+  async updateComment(
+    id: string,
+    postId: string,
+    data: UpdateCommentDto,
+    userId: string,
+  ) {
     const existComment = await this.getCommentById(id, postId);
 
+    if (existComment.data.userId !== userId) {
+      throw new ForbiddenException(
+        'You are not allowed to update this comment',
+      );
+    }
     if (data.content === existComment.data.content) {
       throw new BadRequestException('Input data is the same as before');
     }
@@ -81,9 +92,28 @@ export class CommentService {
     };
   }
 
-  async deleteComment(id: string, postId: string) {
-    await this.getCommentById(id, postId);
+  async deleteComment(id: string, postId: string, userId: string) {
+    const existPost = await this.postService.getPostById(postId);
+    const existComment = await this.getCommentById(id, postId);
 
+    if (
+      existComment.data.userId !== userId ||
+      existPost.data.userId !== userId
+    ) {
+      throw new ForbiddenException(
+        'You are not allowed to delete this comment',
+      );
+    }
+
+    await this.commentRepository.deleteComment(id, postId);
+    return {
+      message: 'Comment deleted successfully',
+    };
+  }
+
+  async deleteCommentByStaff(id: string, postId: string) {
+    await this.postService.getPostById(postId);
+    await this.getCommentById(id, postId);
     await this.commentRepository.deleteComment(id, postId);
     return {
       message: 'Comment deleted successfully',

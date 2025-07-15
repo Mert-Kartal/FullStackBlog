@@ -13,9 +13,11 @@ import {
 import { Request } from 'express';
 import { PostService } from './post.service';
 import { CreatePostDto, UpdatePostDto } from '../dto/post.dto';
-import { JwtGuard } from '../shared/guards';
+import { JwtGuard, RolesGuard } from '../shared/guards';
 import { CommentService } from './comment/comment.service';
 import { CreateCommentDto, UpdateCommentDto } from '../dto/comment.dto';
+import { Roles } from 'src/shared';
+import { Role } from '@prisma/client';
 
 @Controller('posts')
 export class PostController {
@@ -45,14 +47,34 @@ export class PostController {
   async updatePost(
     @Param('id', ParseUUIDPipe) id: string,
     @Body() data: UpdatePostDto,
+    @Req() req: Request,
   ) {
-    return this.postService.updatePost(id, data);
+    return this.postService.updatePost(id, data, req.user!.userId);
+  }
+  @Roles(Role.MODERATOR, Role.ADMIN)
+  @UseGuards(JwtGuard, RolesGuard)
+  @Patch(':id')
+  async updatePostByStaff(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body() data: UpdatePostDto,
+  ) {
+    return this.postService.updatePostByStaff(id, data);
   }
 
   @UseGuards(JwtGuard)
   @Delete(':id')
-  async deletePost(@Param('id', ParseUUIDPipe) id: string) {
-    return this.postService.deletePost(id);
+  async deletePost(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: Request,
+  ) {
+    return this.postService.deletePost(id, req.user!.userId);
+  }
+
+  @Roles(Role.ADMIN)
+  @UseGuards(JwtGuard, RolesGuard)
+  @Delete(':id')
+  async deletePostByAdmin(@Param('id', ParseUUIDPipe) id: string) {
+    return this.postService.deletePostByAdmin(id);
   }
 
   @UseGuards(JwtGuard)
@@ -102,8 +124,14 @@ export class PostController {
     @Param('id', ParseUUIDPipe) id: string,
     @Param('commentId', ParseUUIDPipe) commentId: string,
     @Body() data: UpdateCommentDto,
+    @Req() req: Request,
   ) {
-    return this.commentService.updateComment(commentId, id, data);
+    return this.commentService.updateComment(
+      commentId,
+      id,
+      data,
+      req.user!.userId,
+    );
   }
 
   @UseGuards(JwtGuard)
@@ -111,7 +139,18 @@ export class PostController {
   async deleteComment(
     @Param('id', ParseUUIDPipe) id: string,
     @Param('commentId', ParseUUIDPipe) commentId: string,
+    @Req() req: Request,
   ) {
-    return this.commentService.deleteComment(commentId, id);
+    return this.commentService.deleteComment(commentId, id, req.user!.userId);
+  }
+
+  @Roles(Role.ADMIN, Role.MODERATOR)
+  @UseGuards(JwtGuard, RolesGuard)
+  @Delete(':id/comments/:commentId')
+  async deleteCommentByStaff(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('commentId', ParseUUIDPipe) commentId: string,
+  ) {
+    return this.commentService.deleteCommentByStaff(commentId, id);
   }
 }
