@@ -97,7 +97,7 @@ export class CommentService {
     const existComment = await this.getCommentById(id, postId);
 
     if (
-      existComment.data.userId !== userId ||
+      existComment.data.userId !== userId &&
       existPost.data.userId !== userId
     ) {
       throw new ForbiddenException(
