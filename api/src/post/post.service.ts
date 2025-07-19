@@ -18,6 +18,7 @@ export class PostService {
 
   private async checkPost(id: string) {
     const post = await this.postRepository.show(id);
+
     if (!post || post.deletedAt) {
       throw new NotFoundException('Post not found');
     }
@@ -29,6 +30,14 @@ export class PostService {
     if (!category || category.data.deletedAt) {
       throw new NotFoundException('Category not found');
     }
+  }
+
+  private async checkUser(id: string) {
+    const user = await this.userService.checkUserById(id);
+    if (!user || user.deletedAt) {
+      throw new NotFoundException('User not found');
+    }
+    return user;
   }
 
   async createPost(userId: string, data: CreatePostDto) {
@@ -61,25 +70,15 @@ export class PostService {
     };
   }
 
-  async updatePost(userId: string, id: string, data: UpdatePostDto) {
+  async updatePost(id: string, data: UpdatePostDto, userId?: string) {
     const post = await this.checkPost(id);
 
-    const user = await this.userService.checkUserById(userId);
+    if (userId) {
+      await this.checkUser(userId);
 
-    if (!user || user.deletedAt) {
-      throw new NotFoundException('User not found');
-    }
-
-    if (
-      post.userId !== userId &&
-      user.role !== 'ADMIN' &&
-      user.role !== 'MODERATOR'
-    ) {
-      throw new ForbiddenException('You are not allowed to update this post');
-    }
-
-    if (data.categoryId) {
-      await this.checkCategory(data.categoryId);
+      if (post.userId !== userId) {
+        throw new ForbiddenException('You are not allowed to update this post');
+      }
     }
 
     const updatedPost = await this.postRepository.update(id, data);
@@ -89,17 +88,15 @@ export class PostService {
     };
   }
 
-  async deletePost(userId: string, id: string) {
+  async deletePost(id: string, userId?: string) {
     const post = await this.checkPost(id);
 
-    const user = await this.userService.checkUserById(userId);
+    if (userId) {
+      await this.checkUser(userId);
 
-    if (!user || user.deletedAt) {
-      throw new NotFoundException('User not found');
-    }
-
-    if (post.userId !== userId && user.role !== 'ADMIN') {
-      throw new ForbiddenException('You are not allowed to delete this post');
+      if (post.userId !== userId) {
+        throw new ForbiddenException('You are not allowed to delete this post');
+      }
     }
 
     await this.postRepository.delete(id);

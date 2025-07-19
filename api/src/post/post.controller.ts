@@ -39,7 +39,7 @@ export class PostController {
     @Body() data: UpdatePostDto,
     @Req() req: Request,
   ) {
-    return this.postService.updatePost(req.user!.userId, id, data);
+    return this.postService.updatePost(id, data, req.user!.userId);
   }
 
   @UseGuards(JwtGuard)
