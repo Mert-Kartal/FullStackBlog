@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CreatePostDto, UpdatePostDto } from 'src/dto/post.dto';
+import { CreatePostDto, UpdatePostDto } from '../dto/post.dto';
 import { PostRepository } from './post.repository';
 import { UserService } from '../user/user.service';
 import { CategoryService } from '../category/category.service';

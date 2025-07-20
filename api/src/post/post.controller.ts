@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   Param,
+  ParseUUIDPipe,
   Patch,
   Post,
   Req,
@@ -28,14 +29,14 @@ export class PostController {
   }
 
   @Get(':id')
-  async getPostById(@Param('id') id: string) {
+  async getPostById(@Param('id', ParseUUIDPipe) id: string) {
     return this.postService.getPostById(id);
   }
 
   @UseGuards(JwtGuard)
   @Patch(':id')
   async updatePost(
-    @Param('id') id: string,
+    @Param('id', ParseUUIDPipe) id: string,
     @Body() data: UpdatePostDto,
     @Req() req: Request,
   ) {
@@ -44,7 +45,10 @@ export class PostController {
 
   @UseGuards(JwtGuard)
   @Delete(':id')
-  async deletePost(@Param('id') id: string, @Req() req: Request) {
-    return this.postService.deletePost(req.user!.userId, id);
+  async deletePost(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Req() req: Request,
+  ) {
+    return this.postService.deletePost(id, req.user!.userId);
   }
 }

@@ -10,5 +10,6 @@ import { CategoryModule } from '../category/category.module';
   imports: [PrismaModule, SharedModule, UserModule, CategoryModule],
   controllers: [PostController],
   providers: [PostService, PostRepository],
+  exports: [PostService],
 })
 export class PostModule {}
