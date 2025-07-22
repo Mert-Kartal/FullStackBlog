@@ -16,7 +16,7 @@ import { CreateTagDto, UpdateTagDto } from '../dto/tag.dto';
 import { TagService } from '../tag/tag.service';
 import { PostService } from '../post/post.service';
 import { UpdatePostDto } from '../dto/post.dto';
-
+import { CommentService } from '../post/comment/comment.service';
 @Controller('admin')
 @Roles(Role.ADMIN)
 @UseGuards(JwtGuard, RolesGuard)
@@ -25,8 +25,10 @@ export class AdminController {
     private readonly categoryService: CategoryService,
     private readonly tagService: TagService,
     private readonly postService: PostService,
+    private readonly commentService: CommentService,
   ) {}
 
+  // Category
   @Post('categories')
   async createCategory(@Body() data: CreateCategoryDto) {
     return this.categoryService.createCategory(data);
@@ -45,6 +47,7 @@ export class AdminController {
     return this.categoryService.deleteCategory(id);
   }
 
+  // Tag
   @Post('tags')
   async createTag(@Body() data: CreateTagDto) {
     return this.tagService.createTag(data);
@@ -63,6 +66,7 @@ export class AdminController {
     return this.tagService.deleteTag(id);
   }
 
+  // Post
   @Patch('posts/:id')
   async updatePost(
     @Param('id', ParseUUIDPipe) id: string,
@@ -74,5 +78,14 @@ export class AdminController {
   @Delete('posts/:id')
   async deletePost(@Param('id', ParseUUIDPipe) id: string) {
     return this.postService.deletePost(id);
+  }
+
+  // Comment
+  @Delete('posts/:id/comments/:commentId')
+  async deleteComment(
+    @Param('id', ParseUUIDPipe) id: string,
+    @Param('commentId', ParseUUIDPipe) commentId: string,
+  ) {
+    return this.commentService.deleteComment(id, commentId);
   }
 }

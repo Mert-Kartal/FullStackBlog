@@ -3,9 +3,8 @@ import { CategoryService } from './category.service';
 import { CategoryController } from './category.controller';
 import { CategoryRepository } from './category.repository';
 import { PrismaModule } from '../prisma/prisma.module';
-import { SharedModule } from '../shared/shared.module';
 @Module({
-  imports: [PrismaModule, SharedModule],
+  imports: [PrismaModule],
   providers: [CategoryService, CategoryRepository],
   controllers: [CategoryController],
   exports: [CategoryService],

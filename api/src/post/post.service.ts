@@ -16,7 +16,7 @@ export class PostService {
     private readonly categoryService: CategoryService,
   ) {}
 
-  private async checkPost(id: string) {
+  async checkPost(id: string) {
     const post = await this.postRepository.show(id);
 
     if (!post || post.deletedAt) {
